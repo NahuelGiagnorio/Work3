@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--Bootstrap-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <!--BS icons-->
+    <link rel="stylesheet" href="https://icons.getbootstrap.com/assets/font/bootstrap-icons.min.css">
+
+    <!--CSS-->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!--bootstrap js-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <title>Airbnb</title>
+</head>
+
+<body>
+
+<!--Nav bar-->
+    <nav class="navbar navbar-expand-md bg-dark fixed-top"  data-bs-theme="dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="index.html"> <img src="images/airbnb_logo.png" alt="logo image"> Airbnb</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#miMenu" >
+            <span class="bi bi-menu-button-wide-fill"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="miMenu">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" href="index.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="https://www.maldivas.net/">Destination of the month!</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                 Social Network Links
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="https://www.instagram.com/airbnb?igsh=azYyd2w1ODhvbnZ6">Instagram</a></li>
+                 <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="https://www.linkedin.com/company/airbnb/">LinkedIn</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav> 
+<!--close nav-->
+
+    <header>
+        <img class="img-fluid" src="images/airbnb_initial.jpg" alt="Airbnb_start">
+        <div class="d-flex justify-content-center">
+            <div class="col-md-6 col-lg-9">
+                <h1>Let us find your place! No matter where you are!</h1>
+                <p id="space">No matter where your journey takes you, we will match you with the perfect spot for your adventure.</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container text-center" id="space">
+            <div class="row">
+              <div class="col-lg-4 col-md-3">
+                <h3>Discover Unique Stays</h3>
+                <p>Experience travel like never before with Airbnb. From cozy treehouses to stunning beachfront villas, find unique accommodations that make your journey unforgettable. Explore hidden gems and stay your way.</p>
+              </div>
+              <div class="col-lg-4 col-md-6">
+                 <h3>Host Your Space</h3>
+                 <p>Turn your extra space into extra income. Hosting on Airbnb is easy, secure, and rewarding. Share your home with travelers from around the world and be part of a global community.</p>
+              </div>
+              <div class="col-lg-4 col-md-3">
+                <h3>Your Adventure Awaits</h3>
+                <p>Plan the perfect getaway with Airbnb. Whether you're seeking a tranquil escape or a vibrant city adventure, book stays and experiences that match your style and budget. Let your journey begin.</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="space" class="d-flex justify-content-center">
+            <div class="col-6 text-center">
+                <h4>Find Your Perfect Getaway on Airbnb</h4>
+                <p>From serene forest cabins to stylish urban penthouses, Airbnb offers diverse stays that cater to every traveler. Discover your next destination today.</p>
+            </div>
+          </div>
+
+          <section id="space" class="container-fluid row justify-content-center">
+
+            <div class="col-md-4 col-lg-3">
+                <img class="img-fluid" src="images/forest.jpg" alt="forest_home">
+            </div>
+
+            <div class="col-md-4 col-lg-3">
+                <img class="img-fluid" src="images/penthouse.jpg" alt="penthouse">
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="w-100 bg-dark">
+
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#miModal">
+            Contact Us!
+            </button>
+          
+            <div class="modal fade" id="miModal" tabindex="-1" >
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-body">
+                 
+                    <form class="needs-validation" novalidate action="code.php" method="post">
+
+                        <fieldset>
+                            <legend>Personal Information</legend>
+                
+                            <div class="modal-body">
+
+                                <div class="position-relative">
+                                    <label for="name" class="form-label"> Name</label>
+                                    <input required class="form-control" type="text" name="name" id="name" placeholder="John Doe">
+                                    <div class="invalid-tooltip">The name is incomplete!</div>
+                                </div> 
+                
+                                <div class="position-relative">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input required type="email" name="email" id="email" class="form-control" multiple placeholder="mail1@gmail.com, mail2@outlook.com">
+                                    <div class="invalid-tooltip">The email is wrong!</div>
+                                </div>
+
+                            <div class="position-relative">
+                                <label for="age" class="form-label">Age</label>
+                                <input required name="age" type="number" id="age" min="18" max="100" class="form-control"> <div class="invalid-tooltip">The age is not between 18-100!</div>
+                            </div>
+
+                        </fieldset>
+                
+                        <fieldset>
+                            <legend>Trip type</legend>
+                            <label><input type="radio" name="trip type">Solo</label>
+                            <label><input type="radio" name="trip type">Family</label>
+                            <label><input type="radio" name="trip type">Friends </label>
+                        </fieldset>
+                
+                        <button>Send</button>
+                
+                    </form>
+
+                        </div>
+                    
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+    </footer>
+
+    <script src="js/code.js"></script>
+
+</body>
+
+</html>
