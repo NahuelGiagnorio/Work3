@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>OAJNU · Carrusel 10/10 Día Mundial de la Salud Mental</title>
+<!--
+  Carrusel de Instagram, 8 placas de 1080 x 1350 px (4:5).
+  Sigue el Manual de Identidad Visual Institucional de OAJNU:
+  - Colores: naranja #e05206 (primario), cyan #009aa6 (complementario), blanco, negro y grises.
+  - Nunca naranja sobre cyan ni cyan sobre naranja. Sobre naranja o cyan se escribe en blanco.
+  - Nunito: Black para títulos, ExtraBold para subtítulos y para resaltar, Regular para el texto.
+  - Texturas de papel naranja, cyan y blanco, resaltadores y papel roto ("estilo escolar").
+  - Todos los elementos con vértices redondeados y sin sombras.
+  - Logo: marca nominal original (blanca sobre color, naranja sobre blanco), sin modificar.
+  Para exportar a PNG: node render.mjs
+-->
+<style>
+  @font-face { font-family: Nunito; font-weight: 400; src: url(fonts/nunito-latin-400-normal.woff2) format("woff2"); }
+  @font-face { font-family: Nunito; font-weight: 700; src: url(fonts/nunito-latin-700-normal.woff2) format("woff2"); }
+  @font-face { font-family: Nunito; font-weight: 800; src: url(fonts/nunito-latin-800-normal.woff2) format("woff2"); }
+  @font-face { font-family: Nunito; font-weight: 900; src: url(fonts/nunito-latin-900-normal.woff2) format("woff2"); }
+
+  :root {
+    --naranja: #e05206;
+    --cyan: #009aa6;
+    --gris: #3a3a3a;
+    --gris-claro: #ededed;
+    --blanco: #ffffff;
+    /* Márgenes de seguridad: el contenido vive dentro de 888 x 1110 px */
+    --m-lado: 96px;
+    --m-arriba: 72px;
+    --m-abajo: 72px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #222; font-family: Nunito, Calibri, sans-serif; display: flex; flex-wrap: wrap; gap: 40px; padding: 40px; }
+
+  .placa {
+    position: relative;
+    width: 1080px; height: 1350px;
+    overflow: hidden;
+    padding: var(--m-arriba) var(--m-lado) var(--m-abajo);
+    display: flex; flex-direction: column;
+    color: var(--blanco);
+  }
+  .placa.naranja { background: var(--naranja); }
+  .placa.cyan { background: var(--cyan); }
+  .placa.blanca { background: #f4f4f2; color: var(--gris); }
+
+  /* Textura de papel arrugado, sin sombras sobre los elementos */
+  .papel { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  .placa > *:not(.papel):not(.burbujas) { position: relative; z-index: 1; }
+
+  /* Encabezado fijo: logo + número de placa */
+  .cabecera { display: flex; justify-content: space-between; align-items: center; height: 64px; }
+  .cabecera img { height: 52px; display: block; }
+  .contador { font-weight: 800; font-size: 26px; letter-spacing: 2px; padding: 8px 22px; border-radius: 999px; border: 3px solid currentColor; }
+
+  .cuerpo { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+  /* Pie: indicación de deslizar, a la derecha para no chocar con los puntitos del carrusel */
+  .pie { height: 72px; display: flex; justify-content: space-between; align-items: center; font-size: 26px; font-weight: 700; }
+  .deslizar { display: inline-flex; align-items: center; gap: 14px; font-weight: 800; font-size: 28px; padding: 12px 28px; border-radius: 999px; }
+  .naranja .deslizar, .cyan .deslizar { background: var(--blanco); }
+  .naranja .deslizar { color: var(--naranja); }
+  .cyan .deslizar { color: var(--cyan); }
+  .blanca .deslizar { background: var(--naranja); color: var(--blanco); }
+  .deslizar svg { width: 40px; height: 22px; }
+
+  /* Tipografía */
+  .etiqueta { display: inline-block; align-self: flex-start; font-weight: 800; font-size: 30px; letter-spacing: 1px; padding: 10px 26px; border-radius: 999px; margin-bottom: 36px; }
+  .naranja .etiqueta { background: var(--blanco); color: var(--naranja); }
+  .cyan .etiqueta { background: var(--blanco); color: var(--cyan); }
+  .blanca .etiqueta { background: var(--cyan); color: var(--blanco); }
+
+  h1 { font-weight: 900; font-size: 112px; line-height: 1.0; letter-spacing: -1px; }
+  h2 { font-weight: 900; font-size: 80px; line-height: 1.05; letter-spacing: -0.5px; margin-bottom: 40px; }
+  .blanca h2 { color: var(--gris); }
+  p, li { font-size: 38px; line-height: 1.4; font-weight: 400; }
+  strong { font-weight: 800; }
+  .blanca strong.n { color: var(--naranja); }
+  .blanca strong.c { color: var(--cyan); }
+
+  /* Resaltador (marcador) detrás de una palabra */
+  .resaltado { position: relative; white-space: nowrap; }
+  .resaltado::before {
+    content: ""; position: absolute; z-index: -1;
+    left: -10px; right: -14px; bottom: 0.06em; height: 0.46em;
+    border-radius: 14px 22px 18px 12px; transform: rotate(-1.2deg);
+  }
+  .blanca .resaltado::before { background: rgba(224, 82, 6, 0.38); }
+  .naranja .resaltado::before, .cyan .resaltado::before { background: rgba(255, 255, 255, 0.32); }
+
+  /* Papel roto blanco (contenedor "escolar") */
+  .papelito {
+    display: inline-block; align-self: flex-start;
+    background: var(--blanco); padding: 18px 40px 22px;
+    clip-path: polygon(1% 8%, 6% 2%, 14% 6%, 22% 1%, 31% 5%, 40% 0%, 50% 4%, 59% 1%, 68% 5%, 77% 1%, 86% 4%, 94% 0%, 99% 6%, 100% 50%, 98% 94%, 92% 99%, 83% 96%, 74% 100%, 65% 95%, 56% 99%, 47% 96%, 38% 100%, 29% 95%, 20% 99%, 11% 96%, 3% 100%, 0% 52%);
+    transform: rotate(-2deg);
+  }
+  .naranja .papelito { color: var(--naranja); }
+  .cyan .papelito { color: var(--cyan); }
+
+  /* Tarjetas redondeadas */
+  .tarjeta { border-radius: 36px; padding: 34px 40px; }
+  .blanca .tarjeta { background: var(--blanco); border: 4px solid var(--gris-claro); }
+  .cyan .tarjeta, .naranja .tarjeta { background: rgba(255, 255, 255, 0.16); }
+
+  .icono { width: 84px; height: 84px; flex: none; }
+
+  /* ---------- Placa 1: portada ---------- */
+  .portada .cuerpo { justify-content: center; }
+  .portada h1 { font-size: 132px; }
+  .portada .papelito { font-weight: 900; font-size: 76px; margin-top: 28px; margin-left: 6px; }
+  .portada .bajada { font-size: 40px; line-height: 1.35; margin-top: 52px; max-width: 800px; }
+  .burbujas { position: absolute; right: 96px; top: 176px; width: 230px; z-index: 1; }
+
+  /* ---------- Placa 2 ---------- */
+  .dato-lema { margin-top: 40px; display: flex; gap: 32px; align-items: center; }
+  .dato-lema p { font-size: 34px; }
+
+  /* ---------- Placa 3: datos ---------- */
+  .datos { display: flex; flex-direction: column; gap: 32px; }
+  .dato { display: flex; gap: 36px; align-items: center; }
+  .dato .num { font-weight: 900; font-size: 100px; line-height: 1; min-width: 300px; white-space: nowrap; }
+  .dato p { font-size: 36px; }
+  .fuente { font-size: 24px; opacity: 0.85; margin-top: 36px; }
+
+  /* ---------- Placa 4: mitos ---------- */
+  .mitos { display: flex; flex-direction: column; gap: 26px; }
+  .mito { display: flex; flex-direction: column; gap: 12px; }
+  .mito .no { font-weight: 800; font-size: 34px; color: #8a8a8a; text-decoration: line-through; text-decoration-color: var(--naranja); text-decoration-thickness: 5px; }
+  .mito .si { font-size: 34px; line-height: 1.35; }
+  .chip { display: inline-block; font-weight: 900; font-size: 22px; letter-spacing: 2px; padding: 4px 16px; border-radius: 999px; margin-right: 12px; vertical-align: 4px; }
+  .chip.mito-c { background: var(--gris-claro); color: #777; }
+  .chip.real-c { background: var(--cyan); color: var(--blanco); }
+
+  /* ---------- Placa 5: mensaje ---------- */
+  .mensaje h1 { font-size: 104px; }
+  .mensaje .cierre { font-size: 40px; margin-top: 48px; max-width: 840px; }
+  .ods { display: inline-flex; align-items: center; gap: 18px; align-self: flex-start; margin-top: 56px; font-weight: 800; font-size: 30px; padding: 14px 30px; border-radius: 999px; border: 3px solid var(--blanco); }
+
+  /* ---------- Placa 6: pasos ---------- */
+  .pasos { display: flex; flex-direction: column; gap: 22px; }
+  .paso { display: flex; gap: 30px; align-items: center; }
+  .paso .n { flex: none; width: 84px; height: 84px; border-radius: 50%; background: var(--naranja); color: var(--blanco); font-weight: 900; font-size: 44px; display: flex; align-items: center; justify-content: center; }
+  .paso p { font-size: 33px; line-height: 1.35; }
+  .paso p strong { display: block; font-size: 38px; color: var(--gris); }
+
+  /* ---------- Placa 7: líneas de ayuda ---------- */
+  .lineas { display: flex; flex-direction: column; gap: 24px; }
+  .linea { background: var(--blanco); color: var(--gris); border-radius: 36px; padding: 28px 36px; display: flex; align-items: center; gap: 30px; }
+  .linea .tel { flex: none; min-width: 150px; font-weight: 900; font-size: 58px; color: var(--cyan); line-height: 1; white-space: nowrap; }
+  .linea p { font-size: 28px; line-height: 1.3; flex: 1; }
+  .linea p strong { font-size: 30px; display: block; color: var(--gris); }
+  .aviso { font-size: 28px; margin-top: 30px; line-height: 1.35; }
+
+  /* ---------- Placa 8: cierre ---------- */
+  .final .cuerpo { align-items: center; text-align: center; }
+  .final h1 { font-size: 108px; }
+  .final .papelito { align-self: center; font-weight: 900; font-size: 64px; margin-top: 24px; }
+  .acciones { display: flex; gap: 22px; margin-top: 64px; justify-content: center; }
+  .accion { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 250px; padding: 28px 10px; border-radius: 36px; background: rgba(255, 255, 255, 0.16); font-weight: 800; font-size: 28px; }
+  .accion svg { width: 64px; height: 64px; }
+  .final .logo-grande { height: 100px; margin-top: 70px; }
+  .final .usuario { font-weight: 800; font-size: 34px; margin-top: 18px; }
+</style>
+</head>
+<body>
+
+<!-- Textura de papel arrugado reutilizable (SVG, sin imágenes externas) -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="arrugas" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.0045 0.006" numOctaves="4" seed="7" result="ruido"/>
+      <feDiffuseLighting in="ruido" lighting-color="#fff" surfaceScale="7" result="luz">
+        <feDistantLight azimuth="235" elevation="58"/>
+      </feDiffuseLighting>
+      <feColorMatrix in="luz" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -0.9 0 0 0 0.9" result="sombras"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" result="grano"/>
+      <feColorMatrix in="grano" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0" result="granoA"/>
+      <feMerge><feMergeNode in="sombras"/><feMergeNode in="granoA"/></feMerge>
+    </filter>
+    <filter id="arrugasOscuras" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.0045 0.006" numOctaves="4" seed="11" result="ruido"/>
+      <feDiffuseLighting in="ruido" lighting-color="#fff" surfaceScale="7" result="luz">
+        <feDistantLight azimuth="235" elevation="58"/>
+      </feDiffuseLighting>
+      <feColorMatrix in="luz" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -0.55 0 0 0 0.5"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- ============ 1. PORTADA ============ -->
+<section class="placa naranja portada" id="p1">
+  <svg class="papel" viewBox="0 0 1080 1350" preserveAspectRatio="none"><rect width="1080" height="1350" filter="url(#arrugas)" opacity="0.55"/></svg>
+  <div class="cabecera">
+    <img src="assets/logo-blanco.png" alt="OAJNU">
+    <span class="contador">10 de octubre</span>
+  </div>
+
+  <!-- Dos globos de diálogo: hablar y escuchar -->
+  <svg class="burbujas" viewBox="0 0 300 260" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M30 40 h140 a24 24 0 0 1 24 24 v66 a24 24 0 0 1 -24 24 h-82 l-40 34 v-34 h-18 a24 24 0 0 1 -24 -24 v-66 a24 24 0 0 1 24 -24z" fill="#fff"/>
+    <path d="M226 104 h28 a24 24 0 0 1 24 24 v56 a24 24 0 0 1 -24 24 h-10 v30 l-36 -30 h-64 a24 24 0 0 1 -24 -24 v-8"/>
+    <circle cx="66" cy="97" r="4" fill="#e05206" stroke="#e05206"/>
+    <circle cx="100" cy="97" r="4" fill="#e05206" stroke="#e05206"/>
+    <circle cx="134" cy="97" r="4" fill="#e05206" stroke="#e05206"/>
+  </svg>
+
+  <div class="cuerpo">
+    <span class="etiqueta">Día Mundial de la Salud Mental</span>
+    <h1>¿Y vos,<br>cómo estás?</h1>
+    <span class="papelito">(pero de verdad)</span>
+    <p class="bajada">Hoy hablamos de algo que nos importa: <strong>cuidarnos entre pares</strong>.</p>
+  </div>
+  <div class="pie">
+    <span></span>
+    <span class="deslizar">Deslizá <svg viewBox="0 0 40 22" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11h34M26 2l10 9-10 9"/></svg></span>
+  </div>
+</section>
+
+<!-- ============ 2. QUÉ ES ============ -->
+<section class="placa blanca" id="p2">
+  <svg class="papel" viewBox="0 0 1080 1350" preserveAspectRatio="none"><rect width="1080" height="1350" filter="url(#arrugasOscuras)" opacity="0.5"/></svg>
+  <div class="cabecera">
+    <img src="assets/logo-naranja.png" alt="OAJNU">
+    <span class="contador" style="color:var(--naranja)">02 / 08</span>
+  </div>
+  <div class="cuerpo">
+    <span class="etiqueta">¿Qué es el 10/10?</span>
+    <h2>Un día para <span class="resaltado">hablar</span> de lo que muchas veces callamos</h2>
+    <p>Desde 1992, cada 10 de octubre el mundo pone el foco en la <strong class="n">salud mental</strong>: cómo pensamos, sentimos y nos vinculamos con los demás.</p>
+    <div class="dato-lema tarjeta">
+      <svg class="icono" viewBox="0 0 84 84" fill="none" stroke="#009aa6" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M42 74s-30-17-30-40a16 16 0 0 1 30-8 16 16 0 0 1 30 8c0 23-30 40-30 40z"/>
+      </svg>
+      <p>No es solo “no estar mal”. Es poder <strong class="c">disfrutar, estudiar, tener vínculos sanos</strong> y atravesar los días difíciles con apoyo.</p>
+    </div>
+  </div>
+  <div class="pie">
+    <span></span>
+    <span class="deslizar">Deslizá <svg viewBox="0 0 40 22" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11h34M26 2l10 9-10 9"/></svg></span>
+  </div>
+</section>
+
+<!-- ============ 3. DATOS ============ -->
+<section class="placa cyan" id="p3">
+  <svg class="papel" viewBox="0 0 1080 1350" preserveAspectRatio="none"><rect width="1080" height="1350" filter="url(#arrugas)" opacity="0.5"/></svg>
+  <div class="cabecera">
+    <img src="assets/logo-blanco.png" alt="OAJNU">
+    <span class="contador">03 / 08</span>
+  </div>
+  <div class="cuerpo">
+    <span class="etiqueta">Spoiler: no estás solo/a</span>
+    <h2>Nos pasa más de lo que creemos</h2>
+    <div class="datos">
+      <div class="dato tarjeta">
+        <span class="num">1 de 7</span>
+        <p>adolescentes de 10 a 19 años en el mundo vive con un problema de salud mental.</p>
+      </div>
+      <div class="dato tarjeta">
+        <span class="num">50%</span>
+        <p>de los problemas de salud mental empiezan <strong>antes de los 14 años</strong>, y muchos no se detectan.</p>
+      </div>
+    </div>
+    <p class="fuente">Fuente: Organización Mundial de la Salud (OMS).</p>
+  </div>
+  <div class="pie">
+    <span></span>
+    <span class="deslizar">Deslizá <svg viewBox="0 0 40 22" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11h34M26 2l10 9-10 9"/></svg></span>
+  </div>
+</section>
+
+<!-- ============ 4. MITOS ============ -->
+<section class="placa blanca" id="p4">
+  <svg class="papel" viewBox="0 0 1080 1350" preserveAspectRatio="none"><rect width="1080" height="1350" filter="url(#arrugasOscuras)" opacity="0.5"/></svg>
+  <div class="cabecera">
+    <img src="assets/logo-naranja.png" alt="OAJNU">
+    <span class="contador" style="color:var(--naranja)">04 / 08</span>
+  </div>
+  <div class="cuerpo">
+    <h2>Mitos que <span class="resaltado">tenemos</span> que soltar</h2>
+    <div class="mitos">
+      <div class="mito tarjeta">
+        <span class="no"><span class="chip mito-c">MITO</span>“Es una etapa, ya se le va a pasar.”</span>
+        <p class="si"><span class="chip real-c">REAL</span>Lo que sentimos <strong class="c">es válido a cualquier edad</strong> y merece ser escuchado.</p>
+      </div>
+      <div class="mito tarjeta">
+        <span class="no"><span class="chip mito-c">MITO</span>“Pedir ayuda es de débiles.”</span>
+        <p class="si"><span class="chip real-c">REAL</span>Pedir ayuda es <strong class="c">un acto de valentía</strong> y de cuidado propio.</p>
+      </div>
+      <div class="mito tarjeta">
+        <span class="no"><span class="chip mito-c">MITO</span>“Hablar de suicidio da ideas.”</span>
+        <p class="si"><span class="chip real-c">REAL</span>Hablar con respeto y sin prejuicios <strong class="c">abre una puerta</strong> para que nadie se sienta solo/a.</p>
+      </div>
+    </div>
+  </div>
+  <div class="pie">
+    <span></span>
+    <span class="deslizar">Deslizá <svg viewBox="0 0 40 22" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11h34M26 2l10 9-10 9"/></svg></span>
+  </div>
+</section>
+
+<!-- ============ 5. MENSAJE OAJNU ============ -->
+<section class="placa naranja mensaje" id="p5">
+  <svg class="papel" viewBox="0 0 1080 1350" preserveAspectRatio="none"><rect width="1080" height="1350" filter="url(#arrugas)" opacity="0.55"/></svg>
+  <div class="cabecera">
+    <img src="assets/logo-blanco.png" alt="OAJNU">
+    <span class="contador">05 / 08</span>
+  </div>
+  <div class="cuerpo">
+    <span class="etiqueta">Lo que creemos en OAJNU</span>
+    <h1>La prevención también es crear <span class="resaltado">espacios</span> de diálogo</h1>
+    <p class="cierre">Muchas veces, una charla honesta entre jóvenes es <strong>el primer lugar donde alguien se anima a decir cómo se siente</strong>. Ahí empieza el cuidado.</p>
+    <span class="ods">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 35s-14-8-14-19a7.5 7.5 0 0 1 14-3.7A7.5 7.5 0 0 1 34 16c0 11-14 19-14 19z"/><path d="M4 20h7l3-5 4 10 3-5h15"/></svg>
+      ODS 3 · Salud y Bienestar
+    </span>
+  </div>
+  <div class="pie">
+    <span></span>
+    <span class="deslizar">Deslizá <svg viewBox="0 0 40 22" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11h34M26 2l10 9-10 9"/></svg></span>
+  </div>
+</section>
+
+<!-- ============ 6. CÓMO ACOMPAÑAR ============ -->
+<section class="placa blanca" id="p6">
+  <svg class="papel" viewBox="0 0 1080 1350" preserveAspectRatio="none"><rect width="1080" height="1350" filter="url(#arrugasOscuras)" opacity="0.5"/></svg>
+  <div class="cabecera">
+    <img src="assets/logo-naranja.png" alt="OAJNU">
+    <span class="contador" style="color:var(--naranja)">06 / 08</span>
+  </div>
+  <div class="cuerpo">
+    <span class="etiqueta">Guardalo para cuando lo necesites</span>
+    <h2>¿Cómo acompañar a <span class="resaltado">alguien</span>?</h2>
+    <div class="pasos">
+      <div class="paso"><span class="n">1</span><p><strong>Preguntá y escuchá</strong>Sin juzgar, sin apurarte a dar consejos. A veces alcanza con estar.</p></div>
+      <div class="paso"><span class="n">2</span><p><strong>Tomalo en serio</strong>Nada de “no es para tanto”. Lo que siente el otro importa.</p></div>
+      <div class="paso"><span class="n">3</span><p><strong>No lo cargues solo/a</strong>Sugerí hablar con un adulto de confianza o un profesional.</p></div>
+      <div class="paso"><span class="n">4</span><p><strong>Seguí cerca</strong>Un mensaje al otro día también es cuidado.</p></div>
+    </div>
+  </div>
+  <div class="pie">
+    <span></span>
+    <span class="deslizar">Deslizá <svg viewBox="0 0 40 22" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11h34M26 2l10 9-10 9"/></svg></span>
+  </div>
+</section>
+
+<!-- ============ 7. LÍNEAS DE AYUDA ============ -->
+<section class="placa cyan" id="p7">
+  <svg class="papel" viewBox="0 0 1080 1350" preserveAspectRatio="none"><rect width="1080" height="1350" filter="url(#arrugas)" opacity="0.5"/></svg>
+  <div class="cabecera">
+    <img src="assets/logo-blanco.png" alt="OAJNU">
+    <span class="contador">07 / 08</span>
+  </div>
+  <div class="cuerpo">
+    <span class="etiqueta">Si necesitás hablar</span>
+    <h2>Hay alguien del otro lado</h2>
+    <div class="lineas">
+      <div class="linea">
+        <span class="tel">0800 999 0091</span>
+        <p><strong>Línea de Salud Mental</strong>Gratuita, confidencial, 24 h, todo el país.</p>
+      </div>
+      <div class="linea">
+        <span class="tel">135</span>
+        <p><strong>Centro de Asistencia al Suicida</strong>Gratis desde CABA y GBA. Resto del país: (011) 5275-1135.</p>
+      </div>
+      <div class="linea">
+        <span class="tel">911</span>
+        <p><strong>Emergencias</strong>Si hay riesgo inmediato, llamá ya.</p>
+      </div>
+    </div>
+    <p class="aviso"><strong>Pedir ayuda está bien.</strong> No tenés que estar “muy mal” para hablar con alguien.</p>
+  </div>
+  <div class="pie">
+    <span></span>
+    <span class="deslizar">Deslizá <svg viewBox="0 0 40 22" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11h34M26 2l10 9-10 9"/></svg></span>
+  </div>
+</section>
+
+<!-- ============ 8. CIERRE ============ -->
+<section class="placa naranja final" id="p8">
+  <svg class="papel" viewBox="0 0 1080 1350" preserveAspectRatio="none"><rect width="1080" height="1350" filter="url(#arrugas)" opacity="0.55"/></svg>
+  <div class="cabecera">
+    <span></span>
+    <span class="contador">08 / 08</span>
+  </div>
+  <div class="cuerpo">
+    <h1>Abramos la conversación</h1>
+    <span class="papelito">entre todos/as</span>
+    <div class="acciones">
+      <div class="accion">
+        <svg viewBox="0 0 64 64" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8h32a4 4 0 0 1 4 4v44l-20-12-20 12V12a4 4 0 0 1 4-4z"/></svg>
+        Guardalo
+      </div>
+      <div class="accion">
+        <svg viewBox="0 0 64 64" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M58 6 28 36M58 6 40 58l-12-22L6 24z"/></svg>
+        Mandáselo a alguien
+      </div>
+      <div class="accion">
+        <svg viewBox="0 0 64 64" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12h44a4 4 0 0 1 4 4v26a4 4 0 0 1-4 4H28l-12 10V46h-6a4 4 0 0 1-4-4V16a4 4 0 0 1 4-4z"/></svg>
+        Preguntale cómo está
+      </div>
+    </div>
+    <img class="logo-grande" src="assets/logo-blanco.png" alt="OAJNU">
+    <span class="usuario">@oajnu</span>
+  </div>
+  <div class="pie"></div>
+</section>
+
+</body>
+</html>
