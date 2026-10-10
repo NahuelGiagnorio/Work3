@@ -55,4 +55,7 @@ Para editar, cambiá `carrusel.html` y volvé a exportar con `node render.mjs` (
 ## Antes de publicar
 
 - **Verificar los teléfonos** en argentina.gob.ar. Las fuentes consultadas coinciden en 0800 999 0091 y 135 / (011) 5275-1135, pero conviene confirmarlos el día de la publicación.
-- **Fotos:** el entorno donde se armó el carrusel no tenía acceso a bancos de imágenes, así que el diseño se resolvió con texturas e ilustraciones. Si quieren sumar una foto (por ejemplo en la portada o en la placa 5), usen fotos propias de OAJNU con la marca de agua o fotos libres de Unsplash o Pexels, sin contenido partidario ni sombras agregadas.
+- **Fotos:** son de Unsplash, de uso libre con licencia Unsplash, que no exige crédito pero conviene darlo. Están en `assets/`:
+  - Portada: foto de [Lesli Whitecotton](https://unsplash.com/photos/eet-z_TuyWI) (`foto-portada.jpg`).
+  - Placa 5: foto de [Toa Heftiba](https://unsplash.com/photos/l_ExpFwwOEg) (`foto-dialogo.jpg`).
+  - El entorno solo pudo bajar la versión de 400 px, así que van como “fotos pegadas” chicas para que se vean nítidas. Si quieren usarlas más grandes, descarguen la versión completa desde esos links, reemplacen los archivos y vuelvan a exportar.
